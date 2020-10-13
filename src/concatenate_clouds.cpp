@@ -1,31 +1,31 @@
 #include <ros/ros.h>
+
 #include <pcl_ros/point_cloud.h>
 #include <pcl_ros/transforms.h>
 
 #include <pcl/point_types.h>
 #include <pcl/filters/passthrough.h>
+
 #include <tf/transform_listener.h>
 
 typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
 
-// Merged Pointcloud class, TODO: use class to return transformed cloud to add to other cloud objects later
+// Merged Pointcloud class, TODO: reduce callbacks into one, reorganize class...
 class Concat
 {
 private:
-  ros::NodeHandle nh;
+  ros::Publisher pub;
+  ros::Subscriber camera_left, camera_right, camera_top, camera_rear;
 
-  ros::Publisher pub = nh.advertise<PointCloud>("output", 1);
+  PointCloud output_pcl;
+  PointCloud outputs[4];
 
-  ros::Subscriber camera_left = nh.subscribe<PointCloud>("camera_left/depth/points", 1, &Concat::callback1, this);
-  ros::Subscriber camera_right = nh.subscribe<PointCloud>("camera_right/depth/points", 1, &Concat::callback2, this);
-  ros::Subscriber camera_top = nh.subscribe<PointCloud>("camera_top/depth/points", 1, &Concat::callback3, this);
-  ros::Subscriber camera_rear = nh.subscribe<PointCloud>("camera_rear/depth/points", 1, &Concat::callback4, this);
-
-  PointCloud output_pcl, output1_pcl, output2_pcl, output3_pcl, output4_pcl;
-  sensor_msgs::PointCloud2 output;
+  sensor_msgs::PointCloud2 combined_cloud;
   tf::TransformListener listener;
 
-  PointCloud listen(PointCloud cloud)
+  int i;
+
+  PointCloud transform(PointCloud cloud)
   {
     listener.waitForTransform("/world", cloud.header.frame_id, ros::Time(0), ros::Duration(10.0));
     pcl_ros::transformPointCloud("/world", cloud, cloud, listener);
@@ -34,42 +34,51 @@ private:
 
   void pulbish(PointCloud cloud)
   {
-    pcl::toROSMsg(cloud, output);
-    pub.publish(output);
+    pcl::toROSMsg(cloud, combined_cloud);
+    pub.publish(combined_cloud);
   }
 
 public:
-  void callback1(const PointCloud::ConstPtr &cloud_msg)
+  Concat(ros::NodeHandle nh)
   {
-    output1_pcl = *cloud_msg;
-    output1_pcl = listen(output1_pcl);
-    add();
-  }
-  void callback2(const PointCloud::ConstPtr &cloud_msg)
-  {
-    output2_pcl = *cloud_msg;
-    output2_pcl = listen(output2_pcl);
-    add();
-  }
-  void callback3(const PointCloud::ConstPtr &cloud_msg)
-  {
-    output3_pcl = *cloud_msg;
-    output3_pcl = listen(output3_pcl);
-    add();
-  }
-  void callback4(const PointCloud::ConstPtr &cloud_msg)
-  {
-    output4_pcl = *cloud_msg;
-    output4_pcl = listen(output4_pcl);
-    add();
+    i = 0;
+    pub = nh.advertise<PointCloud>("combined_cloud", 1);
+    camera_left = nh.subscribe<PointCloud>("camera_left/depth/points", 1, &Concat::callback_left, this);
+    camera_right = nh.subscribe<PointCloud>("camera_right/depth/points", 1, &Concat::callback_right, this);
+    camera_top = nh.subscribe<PointCloud>("camera_top/depth/points", 1, &Concat::callback_top, this);
+    camera_rear = nh.subscribe<PointCloud>("camera_rear/depth/points", 1, &Concat::callback_rear, this);
   }
 
-  void add()
+  void callback_left(const PointCloud::ConstPtr &cloud_msg)
   {
-    output_pcl = output1_pcl;
-    output_pcl += output2_pcl;
-    output_pcl += output3_pcl;
-    output_pcl += output4_pcl;
+    i = 0;
+    add(cloud_msg);
+  }
+  void callback_right(const PointCloud::ConstPtr &cloud_msg)
+  {
+    i = 1;
+    add(cloud_msg);
+  }
+  void callback_top(const PointCloud::ConstPtr &cloud_msg)
+  {
+    i = 2;
+    add(cloud_msg);
+  }
+  void callback_rear(const PointCloud::ConstPtr &cloud_msg)
+  {
+    i = 3;
+    add(cloud_msg);
+  }
+
+  void add(const PointCloud::ConstPtr &cloud_msg)
+  {
+    outputs[i] = *cloud_msg;
+    outputs[i] = transform(outputs[i]);
+    output_pcl = outputs[0];
+    for (int n = 1; n < sizeof(outputs) / sizeof(PointCloud); n++)
+    {
+      output_pcl += outputs[n];
+    }
     pulbish(output_pcl);
   }
 };
@@ -77,8 +86,9 @@ public:
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "concatenate_clouds");
+  ros::NodeHandle nh;
 
-  Concat concat;
+  Concat concat(nh);
 
   ros::spin();
 }
