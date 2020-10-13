@@ -1,0 +1,12 @@
+<launch>
+
+    <include file="$(find kortex_gazebo)/launch/spawn_kortex_robot.launch">
+        <arg name="arm" value="gen3" />
+        <arg name="gripper" value="robotiq_2f_85" />
+        <arg name="sim_workstation" value="true" />
+        <arg name="dof" value="7" />
+    </include>
+
+    <node pkg="uml_hri_nerve_pick_and_place" name="concatenate_clouds" type="concatenate_clouds"/>
+
+</launch>
