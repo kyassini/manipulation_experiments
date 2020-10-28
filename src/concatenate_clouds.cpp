@@ -11,9 +11,9 @@ PointCloud Concat::transform(PointCloud cloud)
   return cloud;
 }
 
-void Concat::pulbish(PointCloud cloud)
+void Concat::pulbish()
 {
-  pcl::toROSMsg(cloud, combined_cloud);
+  pcl::toROSMsg(output_pcl, combined_cloud);
   pub.publish(combined_cloud);
 }
 
@@ -57,5 +57,4 @@ void Concat::add(const PointCloud::ConstPtr &cloud_msg)
   {
     output_pcl += outputs[n];
   }
-  pulbish(output_pcl);
 }
