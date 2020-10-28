@@ -134,7 +134,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(concatenate_clouds src/concatenate_clouds.cpp)
+add_executable(pick_and_place src/pick_and_place.cpp 
+  src/concatenate_clouds.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -144,10 +145,10 @@ add_executable(concatenate_clouds src/concatenate_clouds.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(concatenate_clouds ${concatenate_clouds_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(pick_and_place ${pick_and_place_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(concatenate_clouds
+target_link_libraries(pick_and_place
   ${catkin_LIBRARIES}
 )
 
