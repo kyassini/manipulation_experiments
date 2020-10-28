@@ -7,6 +7,4 @@
         <arg name="dof" value="7" />
     </include>
 
-    <node pkg="uml_hri_nerve_pick_and_place" name="concatenate_clouds" type="concatenate_clouds"/>
-
 </launch>

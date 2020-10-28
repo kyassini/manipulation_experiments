@@ -1,0 +1,5 @@
+<launch>
+
+    <node pkg="uml_hri_nerve_pick_and_place" name="pick_and_place" type="pick_and_place"/>
+
+</launch>
