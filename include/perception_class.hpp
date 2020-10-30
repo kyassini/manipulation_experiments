@@ -1,0 +1,4 @@
+#ifndef PERCEPTION_CLASS_HPP
+#define PERCEPTION_CLASS_HPP
+
+#endif

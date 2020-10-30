@@ -1,0 +1,4 @@
+#ifndef MANIPULATION_CLASS_HPP
+#define MANIPULATION_CLASS_HPP
+
+#endif 
