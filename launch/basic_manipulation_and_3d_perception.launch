@@ -1,6 +1,7 @@
 <launch>
 
-    <remap from="robot_description" to="/my_gen3/robot_description"/>
-    <node pkg="uml_hri_nerve_pick_and_place" name="basic_manipulation_and_3d_perception" type="basic_manipulation_and_3d_perception"/>
+    <group ns = "/my_gen3">
+        <node pkg="uml_hri_nerve_pick_and_place" name="basic_manipulation_and_3d_perception" type="basic_manipulation_and_3d_perception"/>
+    </group>
 
 </launch>
