@@ -8,8 +8,6 @@
 #include <moveit_msgs/DisplayTrajectory.h>
 #include <moveit_visual_tools/moveit_visual_tools.h>
 
-typedef boost::shared_ptr<moveit::planning_interface::MoveGroupInterface> MoveGroupPtr;
-
 class Manipulation
 {
 private:
@@ -19,12 +17,21 @@ private:
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
     moveit::planning_interface::MoveGroupInterfacePtr move_group_ptr;
 
+    const double pi = std::acos(-1); // Create pi constant (3.14..)
+    
+    void setJointGroup(double j0, double j1, double j2,
+                       double j3, double j4, double j5, double j6);
+
+    void getCurrentState();
+    void move(std::vector<double>);
+
 public:
     Manipulation(ros::NodeHandle nodeHandle, std::string planning_group);
 
+    void goTop();
     void goRight();
-    void getCurrentState();
-    void move();
+    void goLeft();
+    void goVertical();
 };
 
 #endif
