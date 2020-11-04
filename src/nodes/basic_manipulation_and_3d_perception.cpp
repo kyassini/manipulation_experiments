@@ -13,32 +13,25 @@ int main(int argc, char **argv)
   Manipulation manipulation(nh, planning_group);
   Perception perception(nh);
 
-  ROS_INFO_STREAM("Planning group is: " << planning_group);
-
   while (ros::ok())
   {
     // Testing manipulation class...
-
-    /*
     manipulation.goTop();
     ros::Duration(3).sleep();
     perception.snapshot_top();
-  */
+  
     manipulation.goRight();
     ros::Duration(3).sleep();
     perception.snapshot_right();
-    /*
-    ros::Duration(3).sleep();
 
     manipulation.goLeft();
     ros::Duration(3).sleep();
     perception.snapshot_left();
 
     perception.concatenate_clouds();
-
-    manipulation.goVertical();
     ros::Duration(3).sleep();
-  */
+    manipulation.goVertical();
+
     break;
   }
 
