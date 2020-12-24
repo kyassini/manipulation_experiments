@@ -13,26 +13,30 @@ int main(int argc, char **argv)
   Manipulation manipulation(nh, planning_group);
   Perception perception(nh);
 
+  perception.transform_listener = TransformListenerPtr(
+      new tf::TransformListener());
+
   while (ros::ok())
   {
-    // Testing manipulation class...
+    //Testing manipulation class...
+    
     manipulation.goTop();
-    ros::Duration(3).sleep();
+    ros::Duration(1).sleep();
     perception.snapshot_top();
-  
+    ros::Duration(1).sleep();
+
     manipulation.goRight();
-    ros::Duration(3).sleep();
+    ros::Duration(1).sleep();
     perception.snapshot_right();
+    ros::Duration(1).sleep();
 
     manipulation.goLeft();
-    ros::Duration(3).sleep();
+    ros::Duration(1).sleep();
     perception.snapshot_left();
+    ros::Duration(1).sleep();
 
     perception.concatenate_clouds();
-    ros::Duration(3).sleep();
-    manipulation.goVertical();
-
-    break;
+    ros::shutdown();
   }
 
   ros::waitForShutdown();
