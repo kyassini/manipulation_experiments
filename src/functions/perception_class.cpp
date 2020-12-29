@@ -2,7 +2,7 @@
 
 Perception::Perception(ros::NodeHandle nh)
 {
-    pub = nh.advertise<sensor_msgs::PointCloud2>("combined_cloud", 1);
+    pub = nh.advertise<sensor_msgs::PointCloud2>("/combined_cloud", 1);
     wrist_camera = nh.subscribe("/camera/depth/points", 1, &Perception::callback, this);
 }
 
@@ -26,6 +26,8 @@ void Perception::publish()
 
 void Perception::concatenate_clouds()
 {
+    //TODO: add exception when pointcloud is empty...
+
     PointCloud<PointXYZRGB>::Ptr temp_cloud(new PointCloud<PointXYZRGB>);
 
     *temp_cloud = this->left_cloud;
