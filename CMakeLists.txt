@@ -43,7 +43,7 @@ add_executable(basic_manipulation_and_3d_perception
 	src/nodes/basic_manipulation_and_3d_perception.cpp
 	src/functions/manipulation_class.cpp
 	src/functions/perception_class.cpp
-  src/functions/gpd_class.cpp)
+  src/functions/gpd.cpp)
 
 target_link_libraries(basic_manipulation_and_3d_perception ${catkin_LIBRARIES})
 

@@ -1,6 +1,5 @@
 #include "manipulation_class.hpp"
 #include "perception_class.hpp"
-#include "gpd_class.hpp"
 
 int main(int argc, char **argv)
 {
@@ -16,8 +15,6 @@ int main(int argc, char **argv)
 
   perception.transform_listener = TransformListenerPtr(
       new tf::TransformListener());
-
-  GPD gpd(nh);
 
   while (ros::ok())
   {
@@ -40,10 +37,12 @@ int main(int argc, char **argv)
 
     perception.concatenate_clouds();
 
-    while (gpd.planning)
+    while (manipulation.getting_grasps)
     {
-      //gpd.test();
     }
+    
+    manipulation.path_planning();
+
   }
 
   ros::waitForShutdown();
