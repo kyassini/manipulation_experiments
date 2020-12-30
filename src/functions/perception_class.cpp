@@ -2,7 +2,7 @@
 
 Perception::Perception(ros::NodeHandle nh)
 {
-    pub = nh.advertise<sensor_msgs::PointCloud2>("/combined_cloud", 1);
+    pub = nh.advertise<sensor_msgs::PointCloud2>("/cloud_combined", 1);
     wrist_camera = nh.subscribe("/camera/depth/points", 1, &Perception::callback, this);
 }
 

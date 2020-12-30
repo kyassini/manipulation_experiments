@@ -29,6 +29,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
   tf2_eigen
   tf2_geometry_msgs
+  gpd_ros
 )
 
 catkin_package(
@@ -41,6 +42,9 @@ include_directories(include
 add_executable(basic_manipulation_and_3d_perception
 	src/nodes/basic_manipulation_and_3d_perception.cpp
 	src/functions/manipulation_class.cpp
-	src/functions/perception_class.cpp)
+	src/functions/perception_class.cpp
+  src/functions/gpd_class.cpp)
 
 target_link_libraries(basic_manipulation_and_3d_perception ${catkin_LIBRARIES})
+
+add_dependencies(basic_manipulation_and_3d_perception ${catkin_EXPORTED_TARGETS})
