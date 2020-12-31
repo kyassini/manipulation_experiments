@@ -30,6 +30,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_eigen
   tf2_geometry_msgs
   gpd_ros
+  control_msgs
 )
 
 catkin_package(
