@@ -3,9 +3,8 @@
 Manipulation::Manipulation(ros::NodeHandle nodeHandle, std::string planning_group)
 {
     PLANNING_GROUP = planning_group;
-    move_group_ptr = moveit::planning_interface::MoveGroupInterfacePtr(
-        new moveit::planning_interface::MoveGroupInterface(PLANNING_GROUP));
     grasp_config = nodeHandle.subscribe("/detect_grasps/clustered_grasps", 1, &Manipulation::callback, this);
+    this->gripper_command = nodeHandle.advertise<control_msgs::GripperCommandActionGoal>("robotiq_2f_85_gripper_controller/gripper_cmd/goal", 10);
 }
 
 void Manipulation::getCurrentState()
@@ -19,9 +18,8 @@ void Manipulation::getCurrentState()
 
 void Manipulation::move(std::vector<double>)
 {
-    moveit::planning_interface::MoveGroupInterface move_group_ptr(PLANNING_GROUP);
-    move_group_ptr.setJointValueTarget(joint_group_positions);
-    move_group_ptr.move();
+    move_group_ptr->setJointValueTarget(joint_group_positions);
+    move_group_ptr->move();
 }
 
 void Manipulation::setJointGroup(double j0, double j1, double j2, double j3, double j4, double j5, double j6)
@@ -65,4 +63,42 @@ void Manipulation::goVertical()
     ROS_INFO("Moving to Vertical Position");
     setJointGroup(0, 0, 0, 0, 0, 0, 0);
     move(joint_group_positions);
+}
+
+void Manipulation::set_objects()
+{
+    std::vector<moveit_msgs::CollisionObject> collision_objects;
+    collision_objects.resize(3);
+
+    collision_objects[0].id = "object";
+    collision_objects[0].header.frame_id = "world";
+
+    // Define primitives, dimensions and position
+    collision_objects[0].primitives.resize(1);
+    collision_objects[0].primitives[0].type = collision_objects[0].primitives[0].CYLINDER;
+    collision_objects[0].primitives[0].dimensions.resize(2);
+    collision_objects[0].primitives[0].dimensions[0] = 0.01;
+    collision_objects[0].primitives[0].dimensions[1] = 0.01;
+    collision_objects[0].primitive_poses.resize(1);
+    collision_objects[0].primitive_poses[0].position.x = this->pose_sample.x;
+    collision_objects[0].primitive_poses[0].position.y = this->pose_sample.y;
+    collision_objects[0].primitive_poses[0].position.z = this->pose_sample.z;
+
+    collision_objects[0].operation = collision_objects[0].ADD;
+    this->planning_scene_ptr->applyCollisionObjects(collision_objects);
+
+    this->collision_object = collision_objects[0];
+}
+
+void Manipulation::close_gripper()
+{
+    this->gripper_cmd.goal.command.position = 0.7;
+    gripper_command.publish(gripper_cmd);
+}
+
+
+void Manipulation::open_gripper()
+{
+    this->gripper_cmd.goal.command.position = 0;
+    gripper_command.publish(gripper_cmd);
 }

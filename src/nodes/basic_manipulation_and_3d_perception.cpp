@@ -7,6 +7,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
   ros::AsyncSpinner spinner(1);
   spinner.start();
+  ros::Duration(1.0).sleep();
 
   std::string planning_group = "arm";
 
@@ -15,6 +16,20 @@ int main(int argc, char **argv)
 
   perception.transform_listener = TransformListenerPtr(
       new tf::TransformListener());
+
+  manipulation.planning_scene_ptr = PlanningScenePtr(
+      new moveit::planning_interface::PlanningSceneInterface());
+  manipulation.move_group_ptr = MoveGroupPtr(
+      new moveit::planning_interface::MoveGroupInterface(manipulation.PLANNING_GROUP));
+
+  // Set useful variables before robot manipulation begins
+  /*
+  manipulation.move_group_ptr->setPlanningTime(45.0);
+  manipulation.move_group_ptr->setMaxVelocityScalingFactor(0.25);
+  manipulation.move_group_ptr->setPoseReferenceFrame("world");
+  manipulation.move_group_ptr->setPlannerId("RRTConnect");
+  */
+  manipulation.open_gripper();
 
   while (ros::ok())
   {
@@ -36,15 +51,22 @@ int main(int argc, char **argv)
     ros::Duration(1).sleep();
 
     perception.concatenate_clouds();
+    manipulation.goTop();
 
     while (manipulation.getting_grasps)
     {
     }
-    
+
     manipulation.path_planning();
+    if (manipulation.grabbed_object)
+    {
+      manipulation.set_objects();
 
+      manipulation.pick_and_place();
+
+      manipulation.close_gripper();
+    }
   }
-
   ros::waitForShutdown();
 
   return 0;

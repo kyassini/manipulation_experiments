@@ -2,6 +2,7 @@
 #define MANIPULATION_CLASS_HPP
 
 #include <ros/ros.h>
+#include <boost/filesystem.hpp>
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit_msgs/DisplayRobotState.h>
@@ -20,17 +21,16 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
+#include <control_msgs/GripperCommandActionGoal.h>
+
+typedef boost::shared_ptr<moveit::planning_interface::MoveGroupInterface> MoveGroupPtr;
+typedef boost::shared_ptr<moveit::planning_interface::PlanningSceneInterface> PlanningScenePtr;
+
 class Manipulation
 {
 private:
-  moveit::core::RobotStatePtr current_state;
-  std::vector<double> joint_group_positions;
-  std::string PLANNING_GROUP;
-  moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
-  moveit::planning_interface::MoveGroupInterfacePtr move_group_ptr;
-  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-
   ros::Subscriber grasp_config;
+  ros::Publisher gripper_command;
 
   const double pi = std::acos(-1); // Create pi constant (3.14..)
 
@@ -43,17 +43,30 @@ private:
 public:
   Manipulation(ros::NodeHandle nodeHandle, std::string planning_group);
 
+  moveit::core::RobotStatePtr current_state;
+  std::vector<double> joint_group_positions;
+  std::string PLANNING_GROUP;
+  PlanningScenePtr planning_scene_ptr;
+  moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+  MoveGroupPtr move_group_ptr;
+  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
   void goTop();
   void goRight();
   void goLeft();
   void goVertical();
+  void set_objects();
 
+  void close_gripper();
+  void open_gripper();
+  control_msgs::GripperCommandActionGoal gripper_cmd;
 
   // GPD
   void callback(const gpd_ros::GraspConfigList msg);
   void path_planning();
   void set_target_pose();
   void plan_pose_goal();
+  void pick_and_place();
 
   bool getting_grasps = true;
   bool pose_success;
@@ -69,6 +82,7 @@ public:
   geometry_msgs::Point pose;
   geometry_msgs::Point pose_sample;
   geometry_msgs::Vector3 grasp_orientation;
+  moveit_msgs::CollisionObject collision_object;
 
   tf2::Quaternion q;
 };
