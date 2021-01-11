@@ -5,7 +5,7 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "basic_manipulation_and_3d_perception_node");
   ros::NodeHandle nh;
-  ros::AsyncSpinner spinner(1);
+  ros::AsyncSpinner spinner(4);
   spinner.start();
   ros::Duration(1.0).sleep();
 
@@ -22,19 +22,13 @@ int main(int argc, char **argv)
   manipulation.move_group_ptr = MoveGroupPtr(
       new moveit::planning_interface::MoveGroupInterface(manipulation.PLANNING_GROUP));
 
-  // Set useful variables before robot manipulation begins
-  /*
   manipulation.move_group_ptr->setPlanningTime(45.0);
-  manipulation.move_group_ptr->setMaxVelocityScalingFactor(0.25);
-  manipulation.move_group_ptr->setPoseReferenceFrame("world");
-  manipulation.move_group_ptr->setPlannerId("RRTConnect");
-  */
+  manipulation.move_group_ptr->setMaxVelocityScalingFactor(0.50);
+
   manipulation.open_gripper();
 
   while (ros::ok())
   {
-    //Testing manipulation class...
-
     manipulation.goTop();
     ros::Duration(1).sleep();
     perception.snapshot_top();
@@ -66,6 +60,7 @@ int main(int argc, char **argv)
 
       manipulation.close_gripper();
     }
+    ros::Duration(5.0).sleep();
   }
   ros::waitForShutdown();
 
