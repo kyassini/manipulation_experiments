@@ -11,9 +11,23 @@ void Perception::callback(const sensor_msgs::PointCloud2 msg)
     pcl::fromROSMsg(msg, this->current_cloud);
 
     ros::Time stamp = ros::Time(0);
+    tf::StampedTransform transform;
+
     pcl_conversions::toPCL(stamp, this->current_cloud.header.stamp);
-    this->transform_listener->waitForTransform("/world", this->current_cloud.header.frame_id, stamp, ros::Duration(10.0));
-    pcl_ros::transformPointCloud("/world", this->current_cloud, this->current_cloud, *this->transform_listener);
+    try
+    {
+        this->transform_listener->waitForTransform("base_link", this->current_cloud.header.frame_id, stamp, ros::Duration(10.0));
+        this->transform_listener->lookupTransform("base_link", this->current_cloud.header.frame_id, stamp, transform);
+    }
+    catch (tf::TransformException ex)
+    {
+        ROS_ERROR("%s", ex.what());
+    }
+    pcl_ros::transformPointCloud("base_link", this->current_cloud, this->current_cloud, *this->transform_listener);
+
+    //sensor_msgs::PointCloud2 cloud;
+    //toROSMsg(this->current_cloud, cloud);
+    //pub.publish(cloud);
 }
 
 void Perception::publish()
@@ -28,11 +42,13 @@ void Perception::concatenate_clouds()
 {
     //TODO: add exception when pointcloud is empty...
 
-    PointCloud<PointXYZRGB>::Ptr temp_cloud(new PointCloud<PointXYZRGB>);
+    PointCloud<PointXYZ>::Ptr temp_cloud(new PointCloud<PointXYZ>);
 
-    *temp_cloud = this->left_cloud;
-    *temp_cloud += this->right_cloud;
-    *temp_cloud += this->top_cloud;
+    *temp_cloud = this->top_cloud;
+    //*temp_cloud += this->right_cloud;
+    //*temp_cloud += this->left_cloud;
+
+    //*temp_cloud += this->top_cloud;
 
     /*
     if (pcl::io::loadPCDFile("/home/kyassini/Desktop/test_cloud.pcd", *temp_cloud) == -1)
@@ -76,33 +92,58 @@ void Perception::snapshot_top()
     ROS_WARN("Top snapshot complete");
 }
 
-void Perception::passthrough_filter(PointCloud<PointXYZRGB>::Ptr cloud)
+void Perception::passthrough_filter(PointCloud<PointXYZ>::Ptr cloud)
 {
-    PassThrough<PointXYZRGB> pass_x;
+    /*
+    //NERVE WORKSTATION VALUES
+    PassThrough<PointXYZ> pass_x;
     pass_x.setInputCloud(cloud);
     pass_x.setFilterFieldName("x");
     pass_x.setFilterLimits(-0.3, 0.3);
     pass_x.filter(*cloud);
 
-    PassThrough<PointXYZRGB> pass_y;
+    PassThrough<PointXYZ> pass_y;
     pass_y.setInputCloud(cloud);
     pass_y.setFilterFieldName("y");
     pass_y.setFilterLimits(-0.15, 0.2);
     pass_y.filter(*cloud);
 
-    PassThrough<PointXYZRGB> pass_z;
+    PassThrough<PointXYZ> pass_z;
     pass_z.setInputCloud(cloud);
     pass_z.setFilterFieldName("z");
-    pass_z.setFilterLimits(0.8, 1.0);
+    pass_z.setFilterLimits(0.8, 1);
     pass_z.filter(*cloud);
+    */
+
+    
+    //My workstation
+    PassThrough<PointXYZ> pass_x;
+    pass_x.setInputCloud(cloud);
+    pass_x.setFilterFieldName("x");
+    pass_x.setFilterLimits(-0.3, 0.8);
+    pass_x.filter(*cloud);
+
+    PassThrough<PointXYZ> pass_y;
+    pass_y.setInputCloud(cloud);
+    pass_y.setFilterFieldName("y");
+    pass_y.setFilterLimits(-0.3, 0.8);
+    pass_y.filter(*cloud);
+
+    
+    PassThrough<PointXYZ> pass_z;
+    pass_z.setInputCloud(cloud);
+    pass_z.setFilterFieldName("z");
+    pass_z.setFilterLimits(0, 0.2);  //0, 0.2 //0.03, 0.2
+    pass_z.filter(*cloud);
+    
 }
 
-void Perception::segmentPlane(PointCloud<PointXYZRGB>::Ptr cloud)
+void Perception::segmentPlane(PointCloud<PointXYZ>::Ptr cloud)
 {
     // remove table surface
     pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
     pcl::PointIndices::Ptr inliers(new pcl::PointIndices);
-    pcl::SACSegmentation<pcl::PointXYZRGB> seg;
+    pcl::SACSegmentation<pcl::PointXYZ> seg;
 
     seg.setOptimizeCoefficients(true);
     seg.setModelType(pcl::SACMODEL_PERPENDICULAR_PLANE);
@@ -119,7 +160,7 @@ void Perception::segmentPlane(PointCloud<PointXYZRGB>::Ptr cloud)
     seg.setInputCloud(cloud);
     seg.segment(*inliers, *coefficients);
 
-    pcl::ExtractIndices<PointXYZRGB> extract_indices;
+    pcl::ExtractIndices<PointXYZ> extract_indices;
     extract_indices.setInputCloud(cloud);
     extract_indices.setIndices(inliers);
     extract_indices.setNegative(true);

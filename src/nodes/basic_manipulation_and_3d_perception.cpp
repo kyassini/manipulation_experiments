@@ -22,30 +22,41 @@ int main(int argc, char **argv)
   manipulation.move_group_ptr = MoveGroupPtr(
       new moveit::planning_interface::MoveGroupInterface(manipulation.PLANNING_GROUP));
 
+  manipulation.move_group_ptr->detachObject("object");
+  manipulation.remove_objects();
+
   manipulation.move_group_ptr->setPlanningTime(45.0);
   manipulation.move_group_ptr->setMaxVelocityScalingFactor(0.50);
+  manipulation.move_group_ptr->setPlannerId("SBL");
 
-  manipulation.open_gripper();
+  // open gripper
+  manipulation.gripper_cmd.goal.command.position = 0;
+  manipulation.gripper_command.publish(manipulation.gripper_cmd);
+
+
+  //manipulation.open_gripper();
 
   while (ros::ok())
   {
     manipulation.goTop();
-    ros::Duration(1).sleep();
+    ros::Duration(3).sleep();
     perception.snapshot_top();
     ros::Duration(1).sleep();
-
+    /*
     manipulation.goRight();
-    ros::Duration(1).sleep();
+    ros::Duration(3).sleep();
     perception.snapshot_right();
     ros::Duration(1).sleep();
 
     manipulation.goLeft();
-    ros::Duration(1).sleep();
+    ros::Duration(3).sleep();
     perception.snapshot_left();
     ros::Duration(1).sleep();
-
+    */
     perception.concatenate_clouds();
+
     manipulation.goTop();
+    ros::Duration(5).sleep();
 
     while (manipulation.getting_grasps)
     {
@@ -55,12 +66,12 @@ int main(int argc, char **argv)
     if (manipulation.grabbed_object)
     {
       manipulation.set_objects();
-
       manipulation.pick_and_place();
 
-      manipulation.close_gripper();
+      //manipulation.close_gripper();
     }
     ros::Duration(5.0).sleep();
+    ros::shutdown();
   }
   ros::waitForShutdown();
 

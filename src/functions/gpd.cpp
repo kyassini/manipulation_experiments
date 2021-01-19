@@ -35,7 +35,7 @@ void Manipulation::path_planning()
         if (this->pose_success)
         {
             this->grabbed_object = true;
-            ROS_INFO("Plan success");
+            ROS_WARN("Plan success");
             break;
         }
     }
@@ -43,7 +43,7 @@ void Manipulation::path_planning()
 
 void Manipulation::set_target_pose()
 {
-    this->q.setRPY(this->orientation.x - 3.14, this->orientation.y, this->orientation.z);
+    this->q.setRPY(this->orientation.x - pi, this->orientation.y, this->orientation.z);
     this->q.normalize();
     this->target_pose.orientation = tf2::toMsg(this->q);
     this->target_pose.position.x = this->pose_sample.x;
@@ -53,9 +53,9 @@ void Manipulation::set_target_pose()
 
 void Manipulation::plan_pose_goal()
 {
-    this->move_group_ptr->setPoseTarget(target_pose);
-    this->move_group_ptr->setGoalPositionTolerance(0.01);
-    this->move_group_ptr->setGoalOrientationTolerance(0.02);
+    this->move_group_ptr->setPoseTarget(this->target_pose);
+    this->move_group_ptr->setGoalPositionTolerance(0.001);
+    this->move_group_ptr->setGoalOrientationTolerance(0.002);
     this->move_group_ptr->setPlanningTime(5);
     this->move_group_ptr->setNumPlanningAttempts(30);
     this->pose_success = (this->move_group_ptr->plan(this->my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -63,28 +63,49 @@ void Manipulation::plan_pose_goal()
 
 void Manipulation::pick_and_place()
 {
+    std::unique_ptr<actionlib::SimpleActionClient<moveit_msgs::PickupAction>> pick_action_client_;
+
     ROS_ERROR_STREAM("Picking and placing");
-    
-    this->move_group_ptr->setGoalPositionTolerance(0.001);
-    this->move_group_ptr->setGoalOrientationTolerance(0.002);
+    ROS_ERROR_STREAM(this->pose_sample);
+    ROS_ERROR_STREAM(this->pose);
+    ROS_ERROR_STREAM(this->orientation);
+
+    //this->move_group_ptr->setGoalPositionTolerance(0.001);
+    //this->move_group_ptr->setGoalOrientationTolerance(0.002);
+    //this->move_group_ptr->setMaxVelocityScalingFactor(0.1);
+    //this->move_group_ptr->setMaxAccelerationScalingFactor(0.5);
 
     std::vector<moveit_msgs::Grasp> grasps;
     grasps.resize(1);
 
-    grasps[0].grasp_pose.header.frame_id = "base_link";
-    this->q.setRPY(this->orientation.x - 3.14, this->orientation.y, this->orientation.z);
-    this->q.normalize();
+    // Setting grasp pose
+    grasps[0].grasp_pose.header.frame_id = "base_link"; //world
+    this->q.setRPY(this->orientation.x - pi, this->orientation.y, this->orientation.z);
+    //this->q.normalize();
     grasps[0].grasp_pose.pose.orientation = tf2::toMsg(this->q);
-    grasps[0].grasp_pose.pose.position.x = this->pose_sample.x;
-    grasps[0].grasp_pose.pose.position.y = this->pose_sample.y;
-    grasps[0].grasp_pose.pose.position.z = this->pose_sample.z;
+    grasps[0].grasp_pose.pose.position.x = pose.x;
+    grasps[0].grasp_pose.pose.position.y = pose.y;
+    grasps[0].grasp_pose.pose.position.z = pose.z + 0.08; //+0.08
 
-    grasps[0].pre_grasp_approach.direction.header.frame_id = "base_link";
-    /* Direction is set as positive x axis */
+    // Setting pre-grasp pose
+    grasps[0].pre_grasp_approach.direction.header.frame_id = "end_effector_link";
     grasps[0].pre_grasp_approach.direction.vector.z = 1.0;
-    grasps[0].pre_grasp_approach.min_distance = 0;
-    grasps[0].pre_grasp_approach.desired_distance = 0.1;
+    grasps[0].pre_grasp_approach.min_distance = 0.2;     //0.35
+    grasps[0].pre_grasp_approach.desired_distance = 0.3; //0.4
 
-    grasps[0].post_grasp_retreat.direction.header.frame_id = "base_link";
-    this->move_group_ptr->move();
+    // Setting post-grasp retreat
+    grasps[0].post_grasp_retreat.direction.header.frame_id = "end_effector_link";
+    grasps[0].post_grasp_retreat.direction.vector.z = -1.0;
+    grasps[0].post_grasp_retreat.min_distance = 0.01;     //0.1
+    grasps[0].post_grasp_retreat.desired_distance = 0.15; //0.25
+
+    // Setting posture of eef before grasp
+    openGripper(grasps[0].pre_grasp_posture);
+
+    closedGripper(grasps[0].grasp_posture);
+
+    //this->move_group_ptr->setSupportSurfaceName("table");
+
+    //this->move_group_ptr->move();
+    this->move_group_ptr->pick("object", grasps[0]);
 }

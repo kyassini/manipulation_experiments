@@ -8,6 +8,7 @@
 #include <moveit_msgs/DisplayRobotState.h>
 #include <moveit_msgs/DisplayTrajectory.h>
 #include <moveit_visual_tools/moveit_visual_tools.h>
+#include <moveit_msgs/PickupAction.h>
 
 #include "gpd_ros/GraspConfigList.h"
 #include "gpd_ros/GraspConfig.h"
@@ -30,7 +31,6 @@ class Manipulation
 {
 private:
   ros::Subscriber grasp_config;
-  ros::Publisher gripper_command;
 
   const double pi = std::acos(-1); // Create pi constant (3.14..)
 
@@ -41,6 +41,8 @@ private:
   void move(std::vector<double>);
 
 public:
+  ros::Publisher gripper_command;
+
   Manipulation(ros::NodeHandle nodeHandle, std::string planning_group);
 
   moveit::core::RobotStatePtr current_state;
@@ -55,10 +57,12 @@ public:
   void goRight();
   void goLeft();
   void goVertical();
+  void goWait();
   void set_objects();
+  void remove_objects();
 
-  void close_gripper();
-  void open_gripper();
+  void closedGripper(trajectory_msgs::JointTrajectory &);
+  void openGripper(trajectory_msgs::JointTrajectory &);
   control_msgs::GripperCommandActionGoal gripper_cmd;
 
   // GPD

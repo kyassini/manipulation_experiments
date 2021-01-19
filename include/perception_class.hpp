@@ -37,8 +37,8 @@ public:
     Perception(ros::NodeHandle nodeHandle);
     TransformListenerPtr transform_listener;
 
-    PointCloud<PointXYZRGB> combined_cloud;
-    PointCloud<PointXYZRGB> left_cloud, right_cloud, top_cloud, current_cloud;
+    PointCloud<PointXYZ> combined_cloud;
+    PointCloud<PointXYZ> left_cloud, right_cloud, top_cloud, current_cloud;
 
     void callback(const sensor_msgs::PointCloud2 msg);
     void concatenate_clouds();
@@ -48,8 +48,8 @@ public:
     void snapshot_right();
     void snapshot_top();  
 
-    void passthrough_filter(PointCloud<PointXYZRGB>::Ptr);  
-    void segmentPlane(PointCloud<PointXYZRGB>::Ptr);  
+    void passthrough_filter(PointCloud<PointXYZ>::Ptr);  
+    void segmentPlane(PointCloud<PointXYZ>::Ptr);  
 
 };
 
