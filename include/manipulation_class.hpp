@@ -1,8 +1,15 @@
+/*****************************************************************
+  Manipulation Class Definition
+*****************************************************************/
+
+//TODO: Clean up unused functions and headers
+
 #ifndef MANIPULATION_CLASS_HPP
 #define MANIPULATION_CLASS_HPP
 
 #include <ros/ros.h>
 #include <boost/filesystem.hpp>
+
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit_msgs/DisplayRobotState.h>
@@ -10,14 +17,15 @@
 #include <moveit_visual_tools/moveit_visual_tools.h>
 #include <moveit_msgs/PickupAction.h>
 
-#include "gpd_ros/GraspConfigList.h"
-#include "gpd_ros/GraspConfig.h"
+#include <gpd_ros/GraspConfigList.h>
+#include <gpd_ros/GraspConfig.h>
 
 #include <std_msgs/Float32.h>
 
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/PoseArray.h>
 
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -32,16 +40,17 @@ class Manipulation
 private:
   ros::Subscriber grasp_config;
 
-  const double pi = std::acos(-1); // Create pi constant (3.14..)
+  const double pi = std::acos(-1);
 
+  // Move arm functions:
   void setJointGroup(double j0, double j1, double j2,
                      double j3, double j4, double j5, double j6);
-
   void getCurrentState();
   void move(std::vector<double>);
 
 public:
   ros::Publisher gripper_command;
+  ros::Publisher grasps_visualization_pub_;
 
   Manipulation(ros::NodeHandle nodeHandle, std::string planning_group);
 
@@ -58,19 +67,30 @@ public:
   void goLeft();
   void goVertical();
   void goWait();
+  void goPlace();
+
   void set_objects();
   void remove_objects();
 
   void closedGripper(trajectory_msgs::JointTrajectory &);
   void openGripper(trajectory_msgs::JointTrajectory &);
+
+  void close_gripper();
+  void open_gripper();
   control_msgs::GripperCommandActionGoal gripper_cmd;
 
-  // GPD
+  // GPD Functions
   void callback(const gpd_ros::GraspConfigList msg);
   void path_planning();
   void set_target_pose();
   void plan_pose_goal();
   void pick_and_place();
+  void pickup();
+  void place(float);
+
+  geometry_msgs::Point compute_point(geometry_msgs::Point, tf2::Vector3, double);
+  std::vector<geometry_msgs::Pose> gpd_grasp_to_pose(gpd_ros::GraspConfig &);
+  std::deque<std::pair<moveit_msgs::Grasp, ros::Time>> grasp_candidates_;
 
   bool getting_grasps = true;
   bool pose_success;
@@ -82,6 +102,7 @@ public:
 
   geometry_msgs::Pose target_pose;
   geometry_msgs::Vector3 orientation;
+  geometry_msgs::Vector3 axis;
 
   geometry_msgs::Point pose;
   geometry_msgs::Point pose_sample;
