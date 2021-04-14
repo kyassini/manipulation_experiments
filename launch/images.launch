@@ -1,0 +1,5 @@
+<launch>
+    <group ns = "/my_gen3">
+        <node pkg="gqcnn_pick_and_place" name="gqcnn_ros" type="gqcnn_ros.py" output="screen"/>
+    </group>
+</launch>
