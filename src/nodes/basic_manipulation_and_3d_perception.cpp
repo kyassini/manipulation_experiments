@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     perception.concatenate_clouds();
 
     // Set collision objects (grasping object, table)
-    manipulation.set_objects();
+    //manipulation.set_objects();
 
     // Get grasps grom GPD
     while (manipulation.getting_grasps)
@@ -74,12 +74,14 @@ int main(int argc, char **argv)
     if (manipulation.grabbed_object)
     {
       manipulation.pickup();
-      manipulation.place(0.12); // Place at inputed height offset
+      manipulation.place(0.25); // Place at inputed height offset
     }
     ros::Duration(1.0).sleep();
 
-    // Go back to top position for repeating
+    // Go back to top position for repeating, get new grasp
     manipulation.goTop();
+    manipulation.getting_grasps = true;
+
   }
 
   ros::waitForShutdown();
