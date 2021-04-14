@@ -127,7 +127,7 @@ void Manipulation::place(float z_dist)
     this->target_pose.position.z = z_dist;
     plan_pose_goal();
     this->move_group_ptr->move();
-
+/*
     this->q.setRPY(-pi, 0, 0);
     this->target_pose.orientation = tf2::toMsg(this->q);
     this->target_pose.position.x = 0;
@@ -135,9 +135,10 @@ void Manipulation::place(float z_dist)
     this->target_pose.position.z = z_dist - 0.15;
     plan_pose_goal();
     this->move_group_ptr->move();
-
+*/
     open_gripper();
 
+/*
     this->q.setRPY(-pi, 0, 0);
     this->target_pose.orientation = tf2::toMsg(this->q);
     this->target_pose.position.x = 0;
@@ -145,6 +146,7 @@ void Manipulation::place(float z_dist)
     this->target_pose.position.z = z_dist;
     plan_pose_goal();
     this->move_group_ptr->move();
+    */
 }
 
 /* 
@@ -185,7 +187,7 @@ std::vector<geometry_msgs::Pose> Manipulation::gpd_grasp_to_pose(gpd_ros::GraspC
     tf::poseTFToMsg(tf_grasp_odom, pose);
 
     // Find pre-grasp pose
-    tf::Transform tf_pregrasp_odom_(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0, 0, -0.08));
+    tf::Transform tf_pregrasp_odom_(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0, 0, -0.12));
     tf::Transform tf_pregrasp_odom = tf_grasp_odom * tf_pregrasp_odom_;
     tf::poseTFToMsg(tf_pregrasp_odom, pre);
 
