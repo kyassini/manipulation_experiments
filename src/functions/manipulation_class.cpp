@@ -155,7 +155,7 @@ void Manipulation::remove_objects()
 
 void Manipulation::close_gripper()
 {
-    this->gripper_cmd.goal.command.position = 0.5;
+    this->gripper_cmd.goal.command.position = 0.75;
     gripper_command.publish(gripper_cmd);
     ROS_WARN("Closing gripper...");
 }
