@@ -117,7 +117,7 @@ void Perception::snapshot_top()
 void Perception::passthrough_filter(PointCloud<PointXYZ>::Ptr cloud)
 {
     // Ideal NERVE WORKSTATION PassThrough VALUES:
-
+    
     /*
     PassThrough<PointXYZ> pass_x;
     pass_x.setInputCloud(cloud);
@@ -137,13 +137,14 @@ void Perception::passthrough_filter(PointCloud<PointXYZ>::Ptr cloud)
     pass_z.setFilterLimits(0.8, 1);
     pass_z.filter(*cloud);
     */
-
+    
     // Kev's home workstation PassThrough values:
     PassThrough<PointXYZ> pass_z;
     pass_z.setInputCloud(cloud);
     pass_z.setFilterFieldName("z");
-    pass_z.setFilterLimits(0.00, 0.15); //0, 0.2 //0.03, 0.2
+    pass_z.setFilterLimits(0, 0.1); //0, 0.2 //0.03, 0.2
     pass_z.filter(*cloud);
+    
 }
 
 void Perception::segmentPlane(PointCloud<PointXYZ>::Ptr cloud)
