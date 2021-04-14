@@ -44,8 +44,18 @@ add_executable(basic_manipulation_and_3d_perception
 	src/nodes/basic_manipulation_and_3d_perception.cpp
 	src/functions/manipulation_class.cpp
 	src/functions/perception_class.cpp
-  src/functions/gpd.cpp)
+  src/functions/gpd.cpp
+)
+
+add_executable(pick_place_tests
+  src/nodes/perception_test.cpp
+	src/functions/perception_class.cpp
+  src/functions/manipulation_class.cpp
+  src/functions/gpd.cpp
+)
 
 target_link_libraries(basic_manipulation_and_3d_perception ${catkin_LIBRARIES})
+target_link_libraries(pick_place_tests ${catkin_LIBRARIES})
 
 add_dependencies(basic_manipulation_and_3d_perception ${catkin_EXPORTED_TARGETS})
+add_dependencies(pick_place_tests ${catkin_EXPORTED_TARGETS})
