@@ -1,5 +1,0 @@
-<launch>
-    <group ns = "/my_gen3">
-        <node pkg="gqcnn_pick_and_place" name="gqcnn_ros" type="grasp_arm.py" output="screen"/>
-    </group>
-</launch>

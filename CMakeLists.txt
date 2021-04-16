@@ -7,6 +7,15 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   moveit_commander
+  perception
+  autolab_core
+  gqcnn
+  visualization
 )
 
+
 catkin_package()
+
+include_directories(
+    ${catkin_INCLUDE_DIRS}
+)
