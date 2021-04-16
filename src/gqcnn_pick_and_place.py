@@ -15,6 +15,8 @@ if __name__ == "__main__":
     # Camera subscribers
     cams = Camera()
 
+    arm.open_gripper()
+
     arm.go_to_start() # Starting arm position
     rospy.sleep(5)
 
@@ -29,7 +31,7 @@ if __name__ == "__main__":
     
     rospy.sleep(1)
 
-    # Run grasp planner
+    # Run grasp planner service
     run_gqcnn(depth, seg, color, 0.085, "/home/kyassini/catkin_ws/src/gqcnn_pick_and_place/gen3.intr")
-
+    
     rospy.spin()

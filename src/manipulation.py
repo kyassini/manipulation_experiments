@@ -12,17 +12,21 @@ from geometry_msgs.msg import PoseStamped
 from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
+from control_msgs.msg import GripperCommandActionGoal
 
 
 class gen3_movegroup:
     def __init__(self, moveit_commander):
         rospy.Subscriber("/gqcnn_grasp/pose", PoseStamped, self.callback)
+        self.gripper_cmd_pub = rospy.Publisher(
+            "robotiq_2f_85_gripper_controller/gripper_cmd/goal", GripperCommandActionGoal)
+        self.gripper_cmd = GripperCommandActionGoal()
 
         self.robot = moveit_commander.RobotCommander()
         self.scene = moveit_commander.PlanningSceneInterface()
 
         self.group_name = "arm"
-        
+
         self.group = moveit_commander.MoveGroupCommander(self.group_name)
 
         self.display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
@@ -32,6 +36,16 @@ class gen3_movegroup:
         self.planning_frame = self.group.get_planning_frame()
         self.eef_link = self.group.get_end_effector_link()
         self.group_names = self.robot.get_group_names()
+
+    def close_gripper(self):
+        self.gripper_cmd.goal.command.position = 0.75
+        self.gripper_cmd_pub.publish(self.gripper_cmd)
+        rospy.logwarn("Closing Gripper...")
+
+    def open_gripper(self):
+        self.gripper_cmd.goal.command.position = 0
+        self.gripper_cmd_pub.publish(self.gripper_cmd)
+        rospy.logwarn("Opening Gripper...")
 
     def go_to_start(self):
         joint_goal = self.group.get_current_joint_values()
@@ -83,3 +97,7 @@ class gen3_movegroup:
         plan = self.group.go(wait=True)
         self.group.stop()
         self.group.clear_pose_targets()
+
+        self.close_gripper()
+
+        self.go_to_start()
