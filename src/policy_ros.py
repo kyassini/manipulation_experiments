@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 Copyright ©2017. The Regents of the University of California (Regents).
@@ -29,9 +30,6 @@ Author
 ------
 Jeff Mahler
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import argparse
 import logging
@@ -80,8 +78,9 @@ def run_gqcnn(depth_im, segmask, color_im, gripper_width, camera_intr_filename):
                           #frame=camera_intr.frame)
 
     # Read segmask.
-    grasp_resp = plan_grasp_segmask(color_im, depth_im,
-                                    camera_intr.rosmsg, segmask)
+    #grasp_resp = plan_grasp_segmask(color_im, depth_im,
+                                    #camera_intr.rosmsg, segmask)
+    grasp_resp = plan_grasp_segmask(color_im, depth_im, camera_intr.rosmsg, segmask)
 
     # else:
     # grasp_resp = plan_grasp(color_im.rosmsg, depth_im.rosmsg,

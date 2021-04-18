@@ -1,4 +1,5 @@
 <launch>
+    
     <arg name="model_name"       default="GQCNN-4.0-PJ"/>
 
     <include file="$(find gqcnn)/launch/grasp_planning_service.launch">
