@@ -40,8 +40,8 @@ include_directories(include
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(basic_manipulation_and_3d_perception
-	src/nodes/basic_manipulation_and_3d_perception.cpp
+add_executable(gpd_grasping_node
+	src/nodes/gpd_grasping_node.cpp
 	src/functions/manipulation_class.cpp
 	src/functions/perception_class.cpp
   src/functions/gpd.cpp
@@ -54,8 +54,8 @@ add_executable(pick_place_tests
   src/functions/gpd.cpp
 )
 
-target_link_libraries(basic_manipulation_and_3d_perception ${catkin_LIBRARIES})
+target_link_libraries(gpd_grasping_node ${catkin_LIBRARIES})
 target_link_libraries(pick_place_tests ${catkin_LIBRARIES})
 
-add_dependencies(basic_manipulation_and_3d_perception ${catkin_EXPORTED_TARGETS})
+add_dependencies(gpd_grasping_node ${catkin_EXPORTED_TARGETS})
 add_dependencies(pick_place_tests ${catkin_EXPORTED_TARGETS})
