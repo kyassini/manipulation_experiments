@@ -30,6 +30,7 @@
 
 using namespace pcl;
 
+// Smart pointer for transforms
 typedef boost::shared_ptr<tf::TransformListener> TransformListenerPtr;
 
 class Perception
