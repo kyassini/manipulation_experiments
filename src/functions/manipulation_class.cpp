@@ -10,7 +10,7 @@
 Manipulation::Manipulation(ros::NodeHandle nodeHandle, std::string planning_group)
 {
     PLANNING_GROUP = planning_group;
-    grasp_config = nodeHandle.subscribe("/detect_grasps/clustered_grasps", 1, &Manipulation::callback, this);
+    grasp_config = nodeHandle.subscribe("/detect_grasps/clustered_grasps", 1, &Manipulation::callback, this); // Subscribe to GPD output
     this->gripper_command = nodeHandle.advertise<control_msgs::GripperCommandActionGoal>("robotiq_2f_85_gripper_controller/gripper_cmd/goal", 10);
     grasps_visualization_pub_ = nodeHandle.advertise<geometry_msgs::PoseArray>("grasps_visualization", 10);
 }
@@ -27,12 +27,18 @@ void Manipulation::getCurrentState()
     current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);
 }
 
+/* 
+ * Move to specigied joint values: 
+ */
 void Manipulation::move(std::vector<double>)
 {
     move_group_ptr->setJointValueTarget(joint_group_positions);
     move_group_ptr->move();
 }
 
+/* 
+ * Set joint values: 
+ */
 void Manipulation::setJointGroup(double j0, double j1, double j2, double j3, double j4, double j5, double j6)
 {
     joint_group_positions[0] = j0; // base
@@ -75,14 +81,22 @@ void Manipulation::goTop()
 {
     getCurrentState();
     ROS_INFO("Moving to Top Position");
-    setJointGroup(0, pi / 6, 0, pi / 4, 0, pi / 1.75, -pi / 2);
+    setJointGroup(0.043, -0.1824, -0.0133, 2.208, -0.0188, 0.7828, -1.524);
+    move(joint_group_positions);
+}
+
+void Manipulation::goPostGrasp()
+{
+    getCurrentState();
+    ROS_INFO("Moving to Post Grasp Position");
+    setJointGroup(-0.06, 0.4309, 0.0458, 2.1915, -0.0325, -1.043, -1.567);
     move(joint_group_positions);
 }
 
 void Manipulation::goPlace()
 {
     getCurrentState();
-    ROS_INFO("Moving to Top Position");
+    ROS_INFO("Moving to Place Position");
     setJointGroup(pi, pi / 4, 0, pi / 4, 0, pi / 2, -pi / 2);
     move(joint_group_positions);
 }
@@ -96,7 +110,7 @@ void Manipulation::goWait()
 }
 
 /* 
- * Set and remove objects for collision detection: 
+ * Set objects for collision detection: 
  */
 void Manipulation::set_objects()
 {
@@ -134,13 +148,16 @@ void Manipulation::set_objects()
     collision_objects[0].primitive_poses.resize(1);
     collision_objects[0].primitive_poses[0].position.x = 0.4;
     collision_objects[0].primitive_poses[0].position.y = 0;
-    collision_objects[0].primitive_poses[0].position.z = 0;
+    collision_objects[0].primitive_poses[0].position.z = -0.04;
 
     collision_objects[0].operation = collision_objects[0].ADD;
 
     this->planning_scene_ptr->applyCollisionObjects(collision_objects);
 }
 
+/* 
+ * Remove objects from collision detection: 
+ */
 void Manipulation::remove_objects()
 {
     std::vector<std::string> object_ids;
@@ -150,12 +167,12 @@ void Manipulation::remove_objects()
 }
 
 /* 
- * Gripper Commands, TODO: replace with gripper planning group! 
+ * Gripper Action Commands, TODO: replace with gripper planning group! 
  */
 
 void Manipulation::close_gripper()
 {
-    this->gripper_cmd.goal.command.position = 0.75;
+    this->gripper_cmd.goal.command.position = 0.70;
     gripper_command.publish(gripper_cmd);
     ROS_WARN("Closing gripper...");
 }
@@ -168,8 +185,10 @@ void Manipulation::open_gripper()
 }
 
 /* 
- * Gripper Commands for pick() pipeline, not currently used 
+ * Working Gripper Commands for the pick() pipeline, not currently used
  */
+
+/*
 void Manipulation::closedGripper(trajectory_msgs::JointTrajectory &posture)
 {
     //Add finger joints
@@ -215,3 +234,4 @@ void Manipulation::openGripper(trajectory_msgs::JointTrajectory &posture)
 
     posture.points[0].time_from_start = ros::Duration(0.5);
 }
+*/

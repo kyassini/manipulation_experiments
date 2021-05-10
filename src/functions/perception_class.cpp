@@ -25,7 +25,7 @@ void Perception::callback(const sensor_msgs::PointCloud2 msg)
 
     /* 
      * NOTE: base_link transform for sim and basic workstation testing,
-     * world trasnfrom for NERVE workstation 
+     * world transform for NERVE workstation 
      */
 
     pcl_conversions::toPCL(stamp, this->current_cloud.header.stamp);
@@ -42,7 +42,7 @@ void Perception::callback(const sensor_msgs::PointCloud2 msg)
 }
 
 /* 
- * Publish final cloud for grasp detection
+ * Publish final cloud as ROS msg for grasp detection with GPD
  */
 void Perception::publish()
 {
@@ -61,7 +61,7 @@ void Perception::concatenate_clouds()
 
     PointCloud<PointXYZ>::Ptr temp_cloud(new PointCloud<PointXYZ>);
 
-    // Combine clouds, currently only the top view is used so concatenating is not necessary
+    // Combine clouds, currently only the top view is used so concatenating is not necessary!
     *temp_cloud = this->top_cloud;
     //*temp_cloud += this->right_cloud;
     //*temp_cloud += this->left_cloud;
@@ -73,7 +73,7 @@ void Perception::concatenate_clouds()
     {
         ROS_ERROR("Failed to open");
     }
-    ROS_INFO_STREAM("Loaded ");
+    ROS_INFO_STREAM("Loaded Point Clound");
     */
 
     // Apply series of filtering steps to reduce GPD grasp candidate time and isolate object
@@ -83,7 +83,7 @@ void Perception::concatenate_clouds()
 
     this->combined_cloud = *temp_cloud;
 
-    // Optional: save pointcloud
+    // Optional: save pointcloud to a file
     //pcl::io::savePCDFileASCII("test_cloud.pcd", this->combined_cloud);
 
     publish();
@@ -110,15 +110,16 @@ void Perception::snapshot_top()
 
 /*
  * Filtering steps:
- *      Passthrough: isoaltes defined region
- *      segmentPlane: removes table from cloud
- *      voxelGrid: down sample cloud
+ *      Passthrough: isolates defined region (https://pcl.readthedocs.io/en/latest/passthrough.html#passthrough)
+ *      segmentPlane: removes table from cloud (https://pcl.readthedocs.io/en/latest/planar_segmentation.html#planar-segmentation)
+ *      voxelGrid: down sample cloud (https://pcl.readthedocs.io/en/latest/voxel_grid.html#voxelgrid)
  */
+
 void Perception::passthrough_filter(PointCloud<PointXYZ>::Ptr cloud)
 {
-    // Ideal NERVE WORKSTATION PassThrough VALUES:
     
     /*
+    // WORKSTATION PassThrough VALUES:
     PassThrough<PointXYZ> pass_x;
     pass_x.setInputCloud(cloud);
     pass_x.setFilterFieldName("x");
@@ -134,16 +135,18 @@ void Perception::passthrough_filter(PointCloud<PointXYZ>::Ptr cloud)
     PassThrough<PointXYZ> pass_z;
     pass_z.setInputCloud(cloud);
     pass_z.setFilterFieldName("z");
-    pass_z.setFilterLimits(0.8, 1);
+    pass_z.setFilterLimits(0.2, 0.5);
     pass_z.filter(*cloud);
     */
     
-    // Kev's home workstation PassThrough values:
+    
+    // Kev's workstation/No sim workstation PassThrough values:
     PassThrough<PointXYZ> pass_z;
     pass_z.setInputCloud(cloud);
     pass_z.setFilterFieldName("z");
-    pass_z.setFilterLimits(0, 0.1); //0, 0.2 //0.03, 0.2
+    pass_z.setFilterLimits(-0.1, 0.2); //0, 0.2 //0.03, 0.2
     pass_z.filter(*cloud);
+    
     
 }
 
