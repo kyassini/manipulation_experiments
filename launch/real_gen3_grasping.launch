@@ -1,3 +1,5 @@
+<!--Launch file for using the acutal arm
+        Launches GPD, Vision, and Pick/place node -->
 <launch>
 
     <include file="$(find gpd_ros)/launch/gen3.launch"/>
@@ -7,7 +9,7 @@
     </include>
 
     <group ns = "/my_gen3">
-        <node pkg="uml_hri_nerve_pick_and_place" name="basic_manipulation_and_3d_perception" type="basic_manipulation_and_3d_perception" output="screen"/>
+        <node pkg="uml_hri_nerve_pick_and_place" name="gpd_grasping_node" type="basic_manipulation_and_3d_perception" output="screen"/>
     </group>
 
 </launch>

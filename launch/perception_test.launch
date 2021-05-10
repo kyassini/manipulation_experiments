@@ -1,0 +1,6 @@
+<!--Launch Perception Unit Test-->
+<launch>
+    <group ns = "/my_gen3">
+        <node pkg="uml_hri_nerve_pick_and_place" name="pick_place_tests" type="pick_place_tests" output="screen"/>
+    </group>
+</launch>
