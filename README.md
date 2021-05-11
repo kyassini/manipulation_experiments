@@ -1,11 +1,11 @@
 # Description
-This repo contains ROS packages in separate branches for testing two grasping algorithms (GPD 2.0.0 and **GQCNN 1.1.0**) on the Kinova Gen3. Specifically, for grasping comparison experiments.
+This repo contains ROS packages in separate branches for testing two grasping algorithms (GPD 2.0.0 and **Dexnet 2.0.0/GQCNN 1.1.0** [1]) on the Kinova Gen3. Specifically, for grasping comparison experiments.
 All testing was done on Ubuntu 16.04 w/ ROS Kinetic in Simulation and with a Real workstation. 
 
 Note: this package is in python2 due to compatibility issues with Kinetic and python3.  
 For Gen3 setup instructions see the GPD branch.
 
-## Installing Dexnet (Optional: for training new models, gqcnn has already trained models)
+## Installing Dexnet 2.0.0 (Optional: for training new models, gqcnn has already trained models)
 1. After many attempts, could only get it working on Ubuntu 18 w/ ROS melodic and python 3.7
 1. The official instructions [here](https://berkeleyautomation.github.io/dex-net/install/install.html) did not work for me.
 1. Follow this google doc instead: https://docs.google.com/document/d/1YImq1cBTy9E1n1On6-00gueDT4hfmYJK4uOcxZIzPoY/edit?usp=sharing
@@ -61,3 +61,6 @@ To get it working on Ubuntu 16 w/ kinetic, you have to get an old version (1.1.0
  ## Improvements:
  Get the arm running with ROS Melodic to use python3 so that the latest version of everything can just be used.  
  Figure out the transfrom issue as described above and in manipulation.py 
+
+ ## References
+ [1] Mahler, J, Liang, J, Niyaz, S, Laskey, M, Doan, R, Liu, X, Ojea, J, Goldberg, K. "Dex-Net 2.0: Deep Learning to Plan Robust Grasps with Synthetic Point Clouds and Analytic Grasp Metrics". 2017.
