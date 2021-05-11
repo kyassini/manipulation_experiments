@@ -1,5 +1,5 @@
 # Description
-This repo contains ROS packages in separate branches for testing two grasping algorithms (**GPD 2.0.0** and GQCNN 1.1.0) on the Kinova Gen3. Specifically, for grasping comparison experiments.
+This repo contains ROS packages in separate branches for testing two grasping algorithms (**GPD 2.0.0** [1] and GQCNN 1.1.0) on the Kinova Gen3. Specifically, for grasping comparison experiments.
 All testing was done on Ubuntu 16.04 w/ ROS Kinetic in Simulation and with a Real workstation. 
 
 ## Required packages for the Gen3:
@@ -80,3 +80,6 @@ Had to call move() to the pose_sample which removed the ability to use a pre and
 So I Replaced it with using the pose generated from the GPD grasp message directly and [this `createPickingEEFPose` function](https://gist.github.com/tkelestemur/60401be131344dae98671b95d46060f8#file-hsr_gpd_sample-cpp-L9)
 to generate a pre and grasp pose directly from the approach vector.
 * Had an issue with the group names in the `gen3_robotiq_2f_85.srdf.xacro`. This was fixed in ros_kortex /dev/kyassini branch. Might not be needed since pick() isnt being used anymore. 
+
+## References
+[1] Andreas ten Pas, Marcus Gualtieri, Kate Saenko, and Robert Platt. Grasp Pose Detection in Point Clouds. The International Journal of Robotics Research, Vol 36, Issue 13-14, pp. 1455-1473. October 2017.
