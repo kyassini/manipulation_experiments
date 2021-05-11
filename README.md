@@ -1,8 +1,8 @@
 # Description
-This repo contains branches for running two grasping packages (GPD 2.0.0 and **GQCNN 1.1.0**) on the Kinova Gen3. Specifically, for grasping comparison experiments.
+This repo contains ROS packages in separate branches for testing two grasping algorithms (GPD 2.0.0 and **GQCNN 1.1.0**) on the Kinova Gen3. Specifically, for grasping comparison experiments.
 All testing was done on Ubuntu 16.04 w/ ROS Kinetic in Simulation and with a Real workstation. 
 
-Note this package is in python2 due to compatibility issues with kinetic.  
+Note: this package is in python2 due to compatibility issues with Kinetic and python3.  
 For Gen3 setup instructions see the GPD branch.
 
 ## Installing Dexnet (Optional: for training new models, gqcnn has already trained models)
@@ -36,7 +36,12 @@ To get it working on Ubuntu 16 w/ kinetic, you have to get an old version (1.1.0
  python2 examples/policy_ros.py --depth_image data/examples/single_object/primesense/depth_1.npy --segmask data/examples/single_object/primesense/segmask_1.png --camera_intr data/calib/phoxi/phoxi.intr
  ```  
   If you see this, then your installation is all good! You can add your own depth imgs and segmasks to try it out.
-  
+
+<p align="center">
+<img src="imgs/gqcnn_example.png" width="250">
+</p>
+
+
  ## Using the GQCNN Grasping Node
  You will find that for now there are two sets of functions, sim and real arm. Since the real arm has different depth topics and the depth img looks completely different,
  another approach was required. (Error using depth image_raw topic with the real arm, has to be the image topic). In the future, the code should be blended more with the differences dependent on the passed sim argument.
@@ -54,3 +59,6 @@ To get it working on Ubuntu 16 w/ kinetic, you have to get an old version (1.1.0
     These values can be found by `rostopic echo /camera/depth/camera_info` and using the [structure of the CameraInfo msg](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/CameraInfo.html) to determine the k matrix.
  1. The transformation currently used (manipulation.py) is not ideal due to differences between the grasp axes. More detail is provided in the file along with a potential solution.
  
+ ## Improvements:
+ Get the arm running with ROS Melodic to use python3 so that the latest version of everything can just be used.  
+ Figure out the transfrom issue as described above and in manipulation.py 
