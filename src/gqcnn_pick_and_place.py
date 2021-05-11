@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 ################################################### 
-# GQCNN grasping node                             # 
-# - Kevin Yassini (kevin_yassini@student.uml.edu) #
+# GQCNN grasping node - main driver               #
 ###################################################
 
 
