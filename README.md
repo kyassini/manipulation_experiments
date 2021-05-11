@@ -25,8 +25,7 @@ To get it working on Ubuntu 16 w/ kinetic, you have to get an old version (1.1.0
    1. [autolab_core](https://github.com/BerkeleyAutomation/autolab_core), v=0.14.0
    1. [perception](https://github.com/BerkeleyAutomation/perception), v=0.0.9  
    1. [visualization](https://github.com/BerkeleyAutomation/visualization) v=0.1.0
-1. Then you need to get these pip3 modules. Once again, some need specific versions to work with python2!
-    1. ruamel_yaml==0.16.13, colorlog, multiprocess, setproctitle, imagio==2.6.1, trimesh, shapely, pyrender, typing, pyglet==1.4.11, scikit-learn==0.20.4, GPUtil, scikit-image==0.14.5
+1. `pip install -r requirements.txt`
 1. `cd gqcnn/models` and run `download_models.sh` to get the pretrained models. I used GQCNN-4.0-PJ for testing.
 1. After everything has been installed`roslaunch gqcnn grasp_planning_service.launch model_name:=GQCNN-4.0-PJ`
     1. You might get a bunch of tensorflow warnings, but it sill works
