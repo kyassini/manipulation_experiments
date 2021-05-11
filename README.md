@@ -35,6 +35,9 @@ Details here: https://github.com/uml-robotics/uml_hri_nerve_pick_and_place
    1. NOTE: You may have to `catkin clean` first, then build gpd_ros, then build everything else  
    This solves a potential build error
 
+<p align="center">
+<img src="imgs/gpd_example.gif" width="250"><img src="imgs/gpd_example.png" width="150"> 
+</p>
 
 ## Running GPD Grasping node
 1. Need a running kortex diver:
