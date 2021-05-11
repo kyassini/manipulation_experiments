@@ -1,13 +1,13 @@
 # Description
-This repo contains branches for running two grasping packages (**GPD 2.0.0** and GQCNN 1.1.0) on the Kinova Gen3. Specifically, for grasping comparison experiments.
+This repo contains ROS packages in separate branches for testing two grasping algorithms (**GPD 2.0.0** and GQCNN 1.1.0) on the Kinova Gen3. Specifically, for grasping comparison experiments.
 All testing was done on Ubuntu 16.04 w/ ROS Kinetic in Simulation and with a Real workstation. 
 
-## Required packages for the Arm:
-Details here: https://github.com/uml-robotics/uml_hri_nerve_pick_and_place
+## Required packages for the Gen3:
 * [uml_hri_nerve_armada_workstation](https://github.com/uml-robotics/uml_hri_nerve_armada_workstation)
 * [ros_kortex](https://github.com/Kinovarobotics/ros_kortex)
 * [ros_kortex_vision](https://github.com/Kinovarobotics/ros_kortex_vision)
 * [kinova_ros](https://github.com/Kinovarobotics/kinova-ros)  
+More details here: https://github.com/uml-robotics/uml_hri_nerve_pick_and_place
 
 ## Setting Up the Gen3 through Ethernet:
 1. Reset robot to factory settings (Hold power button for 15 seconds)
@@ -15,7 +15,7 @@ Details here: https://github.com/uml-robotics/uml_hri_nerve_pick_and_place
 2. On Ubuntu: Add Ethernet Network Connection -> IPv4 Settings -> Address = 192.168.1.11, Mask = 255.255.255.0
 3. Go to 192.168.1.10 on a browser to confirm
 
-## Setting up GPD ROS without any Issues
+## Setting up GPD_ROS
 1. [Follow the GPD Install Instructions](https://github.com/atenpas/gpd/tree/2.0.0#install)
    1. Make sure to pull the GPD 2.0.0 release
    1. Use PCL version 1.7.2 (Solves PCL error when using GPD_ROS)
@@ -28,18 +28,13 @@ Details here: https://github.com/uml-robotics/uml_hri_nerve_pick_and_place
     ```
 1. Make sure `./detect_grasps ../cfg/eigen_params.cfg ../tutorials/krylon.pcd` works without any errors and the GUI pops up. (Press E to see the grasps)
    1. If anything fails then make sure to resolve it before moving on
-1. Clone [GPD_ROS](https://github.com/atenpas/gpd_ros/) to your catkin_ws src
+1. Clone [GPD_ROS](https://github.com/atenpas/gpd_ros/) to your catkin_ws/src
 1. Replace `ur5.launch` with desired params for the arm and your install location of GPD 2.0.0.
    1. `Gen3.launch` example included in this repo
 1. `Catkin build`
-   1. NOTE: You may have to `catkin clean` first, then build gpd_ros, then build everything else  
-   This solves a potential build error
+   1. NOTE: You may have to `catkin clean`, then build ONLY gpd_ros first. After, you can build everything else. Doing this solved a "bad date error" for me.   
 
-<p align="center">
-<img src="imgs/gpd_example.gif" width="250"><img src="imgs/gpd_example.png" width="150"> 
-</p>
-
-## Running GPD Grasping node
+## Running the GPD Grasping node
 1. Need a running kortex diver:
    1. For simulation (Can toggle sim_workstation):  
    `roslaunch kortex_gazebo spawn_kortex_robot.launch arm:=gen3 gripper:=robotiq_2f_85 sim_workstation:=false dof:=7`
@@ -48,8 +43,14 @@ Details here: https://github.com/uml-robotics/uml_hri_nerve_pick_and_place
    `roslaunch kinova_vision kinova_vision.launch device:=192.168.1.10`
 1. Build and launch the appropriate launch file
    1. `gpd_grasping_node.launch`: launches GPD and the grasping node
-   1. `real_gen3_grasping`: launches the above and the Kinova vision node
+   1. `real_gen3_grasping`: launches the above and the Kinova vision node  
+
+If everything runs correctly, you will get the following behavior:
    
+<p align="center">
+<img src="imgs/gpd_example.gif" width="250"><img src="imgs/gpd_example.png" width="150"> 
+</p>
+
 ## Troubleshooting
 First start with the simulated arm and the sim_workstation disabled to reduced other variables. View the published `Combined_Cloud` in rviz. 
 Occasionally in simulation the cloud will not be transformed correctly, not sure how to fix this as the same code works 100% of the time with the real depth camera.
