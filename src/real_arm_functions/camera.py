@@ -1,13 +1,18 @@
-#!/usr/bin/env python
+###################################################################
+# Camera Class - Subscribes to real arm depth and color camera    #
+# Publishes depth as an array, segmented image, and a color image #                                      # 
+###################################################################
 
 import rospy
 import cv2
 import numpy as np
+
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
 class Camera:
     def __init__(self):
+        """ Camera topics, note: real arm has a different depth topic """
         rospy.Subscriber("/camera/depth/image", Image, self.depth_img, queue_size=1)
         rospy.Subscriber("/camera/color/image_raw", Image, self.binary_img, queue_size=1)
 
@@ -32,10 +37,10 @@ class Camera:
 
         self.depth_img = cv_img
 
-        #self.depth_img = cv_img[65:height, 25:width]
+        #self.depth_img = cv_img[55:height, 45:width]
         #self.depth_img = self.img_cropper(self.depth_img)
 
-        self.depth_img = cv2.resize(self.depth_img, ((1280,720)))
+        #self.depth_img = cv2.resize(self.depth_img, ((1280,720)))
 
         np_img = np.asarray(self.depth_img)
         self.depth_arr = np_img.astype(float)
@@ -44,7 +49,7 @@ class Camera:
         cv_img = self.bridge.imgmsg_to_cv2(msg, "bgr8")
         height, width,_ = cv_img.shape
 
-        self.color_img = cv_img
+        self.color_img = cv2.resize(cv_img, ((480,270)))
         gray = cv2.cvtColor(self.color_img,cv2.COLOR_BGR2GRAY)
         ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 
@@ -66,7 +71,7 @@ class Camera:
         #self.color_img= cv2.resize(self.color_img, ((480,270)))
         #self.bin_img= cv2.resize(self.bin_img, ((480,270)))
 
-        rospy.logerr(self.color_img.shape)
+        #rospy.logerr(self.color_img.shape)
 
 
         rospy.logwarn("Getting imgs...")
@@ -75,7 +80,7 @@ class Camera:
         ros_bin_img = self.bridge.cv2_to_imgmsg(self.bin_img, "8UC1")
         ros_color_img = self.bridge.cv2_to_imgmsg(self.color_img, "bgr8")
 
-        self.seg_pub.publish(ros_bin_img)
+        self.seg_pub.publish(ros_color_img)
         self.depth_pub.publish(ros_depth_img)
 
         return ros_depth, ros_bin_img, ros_color_img

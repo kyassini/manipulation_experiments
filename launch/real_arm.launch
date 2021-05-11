@@ -1,0 +1,16 @@
+<launch>
+    <include file="$(find kinova_vision)/launch/kinova_vision.launch">
+        <arg name="device" value="192.168.1.10"/>
+    </include>
+
+    <arg name="model_name"       default="GQCNN-4.0-PJ"/>
+
+    <include file="$(find gqcnn)/launch/grasp_planning_service.launch">
+        <arg name="model_name" value="$(arg model_name)"/>
+    </include>
+
+    <group ns = "/my_gen3">
+        <node pkg="gqcnn_pick_and_place" name="gqcnn_ros" type="gqcnn_pick_and_place.py" output="screen"/>
+    </group>
+
+</launch>

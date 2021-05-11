@@ -1,6 +1,14 @@
-
 # -*- coding: utf-8 -*-
-"""
+
+############################################################
+# Modified policy_ros for generating grasp from gen3 depth,#
+#       segmented, and color images                        #
+# Calls grasp_planner_node action from GQCNN/ros_nodes     #
+############################################################
+
+""" 
+Original: https://github.com/BerkeleyAutomation/gqcnn/blob/master/examples/policy_ros.py
+
 Copyright ©2017. The Regents of the University of California (Regents).
 All Rights Reserved. Permission to use, copy, modify, and distribute this
 software and its documentation for educational, research, and not-for-profit
@@ -49,12 +57,14 @@ from gqcnn.grasping import Grasp2D, SuctionPoint2D, GraspAction
 from gqcnn.msg import GQCNNGrasp
 from gqcnn.srv import GQCNNGraspPlanner, GQCNNGraspPlannerSegmask
 
-# Set up logger.
+# Set up time logger.
 logger = Logger.get_logger("examples/policy_ros.py")
 
 
-def run_gqcnn(depth_im, segmask, color_im, gripper_width, camera_intr_filename):
+def run_gqcnn(f, depth_im, segmask, color_im, gripper_width, camera_intr_filename):
     namespace = "/gqcnn"
+    
+    # Enables GUI
     vis_grasp = False
 
     # Wait for grasp planning service and create service proxy.
@@ -66,25 +76,19 @@ def run_gqcnn(depth_im, segmask, color_im, gripper_width, camera_intr_filename):
         "%s/grasp_planner_segmask" % (namespace), GQCNNGraspPlannerSegmask)
     cv_bridge = CvBridge()
 
-    # Setup sensor.
+    # Setup camera intrinsics.
     camera_intr = CameraIntrinsics.load(camera_intr_filename)
 
+    # Assign frames to the intrinsic file frame
     depth_im.header.frame_id = camera_intr.frame
     color_im.header.frame_id = camera_intr.frame
 
-    #depth_im = DepthImage.open(depth_im, frame=camera_intr.frame)
-    #color_im = ColorImage(np.zeros([depth_im.height, depth_im.width,
-                                    #3]).astype(np.uint8),
-                          #frame=camera_intr.frame)
+    # Optional: Use segmask image, useful for multiple objects!
+    # grasp_resp = plan_grasp_segmask(color_im, depth_im,
+    # camera_intr.rosmsg, segmask)
 
-    # Read segmask.
-    #grasp_resp = plan_grasp_segmask(color_im, depth_im,
-                                    #camera_intr.rosmsg, segmask)
-    grasp_resp = plan_grasp_segmask(color_im, depth_im, camera_intr.rosmsg, segmask)
-
-    # else:
-    # grasp_resp = plan_grasp(color_im.rosmsg, depth_im.rosmsg,
-    # camera_intr.rosmsg)
+    # Dont use seg image, only dealing with one object
+    grasp_resp = plan_grasp(color_im, depth_im, camera_intr.rosmsg)
 
     grasp = grasp_resp.grasp
 
@@ -117,7 +121,11 @@ def run_gqcnn(depth_im, segmask, color_im, gripper_width, camera_intr_filename):
         sys.exit(1)
     action = GraspAction(grasp_2d, grasp.q_value, thumbnail)
 
-    # Vis final grasp.
+    # Write time and q-value to a file (for NIST experiments)
+    #f.write("\nq = " + str(action.q_value) + " ")
+
+    # Visualize final grasp.
+    # TODO: Currently outputs a blank image with the grasp, need to fix
     if vis_grasp:
         vis.figure(size=(10, 10))
         vis.imshow(segmask, vmin=0.6, vmax=0.9)
