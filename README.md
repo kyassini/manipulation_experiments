@@ -2,18 +2,20 @@
 This repo contains ROS packages in separate branches for testing two grasping algorithms (**GPD 2.0.0** [1] and GQCNN 1.1.0) on the Kinova Gen3. Specifically, for grasping comparison experiments.
 All testing was done on Ubuntu 16.04 w/ ROS Kinetic in Simulation and with a Real workstation. 
 
-## Required packages for the Gen3:
+## Required ROS packages for the Gen3:
 * [uml_hri_nerve_armada_workstation](https://github.com/uml-robotics/uml_hri_nerve_armada_workstation)
 * [ros_kortex](https://github.com/Kinovarobotics/ros_kortex)
 * [ros_kortex_vision](https://github.com/Kinovarobotics/ros_kortex_vision)
 * [kinova_ros](https://github.com/Kinovarobotics/kinova-ros)  
 More details here: https://github.com/uml-robotics/uml_hri_nerve_pick_and_place
 
-## Setting Up the Gen3 through Ethernet:
-1. Reset robot to factory settings (Hold power button for 15 seconds)
-2. Connect Ethernet cable to PC
+## Setting Up the Gen3 through Ethernet:  
+[Gen3 Manual](https://www.kinovarobotics.com/sites/default/files/UG-014_KINOVA_Gen3_Ultra_lightweight_robot-User_guide_EN_R01.pdf)
+1. Reset robot to factory settings (Hold power button for 10 seconds)
+2. Connect Ethernet cable from arm to PC
 2. On Ubuntu: Add Ethernet Network Connection -> IPv4 Settings -> Address = 192.168.1.11, Mask = 255.255.255.0
-3. Go to 192.168.1.10 on a browser to confirm
+3. Go to 192.168.1.10 on a browser to confirm that the arm is connected
+4. Use the arm in RVIZ: `roslaunch kortex_driver kortex_driver.launch arm:=gen3 gripper:=robotiq_2f_85 ip_address:=192.168.1.10`  
 
 ## Setting up GPD_ROS
 1. [Follow the GPD Install Instructions](https://github.com/atenpas/gpd/tree/2.0.0#install)
@@ -79,7 +81,7 @@ Pay attention to any build errors.
 Had to call move() to the pose_sample which removed the ability to use a pre and post grasp as needed for actual grasping.
 So I Replaced it with using the pose generated from the GPD grasp message directly and [this `createPickingEEFPose` function](https://gist.github.com/tkelestemur/60401be131344dae98671b95d46060f8#file-hsr_gpd_sample-cpp-L9)
 to generate a pre and grasp pose directly from the approach vector.
-* Had an issue with the group names in the `gen3_robotiq_2f_85.srdf.xacro`. This was fixed in ros_kortex /dev/kyassini branch. Might not be needed since pick() isnt being used anymore. 
+* Had an issue with the group names in the `gen3_robotiq_2f_85.srdf.xacro`. This was fixed by editing the srdf which can be found in this repo under GPD_Files. However, might not be needed since pick() isn't being used anymore. 
 
 ## References
 [1] Andreas ten Pas, Marcus Gualtieri, Kate Saenko, and Robert Platt. Grasp Pose Detection in Point Clouds. The International Journal of Robotics Research, Vol 36, Issue 13-14, pp. 1455-1473. October 2017.
