@@ -42,13 +42,13 @@ To get it working on Ubuntu 16 w/ kinetic, you have to get an old version (1.1.0
 
 
  ## Using the GQCNN Grasping Node
- You will find that for now there are two sets of functions, sim and real arm. Since the real arm has different depth topics and the depth img looks completely different,
- another approach was required. (Error using depth image_raw topic with the real arm, has to be the image topic). In the future, the code should be blended more with the differences dependent on the passed sim argument.
+ You will find that for now there are two sets of functions in this repo, sim and real arm. Since the real arm has different depth topics and the depth img looks completely different,
+ another approach was required. (There was an error using the depth image_raw topic with the real arm, has to be the image topic). In the future, the code should be blended more with the differences dependent on the passed sim argument.
 
  1. Have the GQCNN grasp_planner running (`roslaunch gqcnn grasp_planning_service.launch model_name:=GQCNN-4.0-PJ`)
- 1. Have the arm driver running, see GPD instructions for gen3 launch files (sim and real arm)
+ 1. Have some instance of the arm driver running, see GPD instructions for gen3 launch files (sim and real arm)
  1. Launch the grasping code.  
-    If using the simulated arm (only tested with the sim_workstation disabled):
+    If using the simulated arm (sim_workstation disabled):
     1. `roslaunch gqcnn_pick_and_place gqcnn_grasping_node.launch sim:=true`  
     Or the actual arm:
     1. `roslaunch gqcnn_pick_and_place gqcnn_grasping_node.launch sim:=false`  
@@ -56,11 +56,11 @@ To get it working on Ubuntu 16 w/ kinetic, you have to get an old version (1.1.0
     1. These imgs are passed to a grasp planner action using a modified version of the ROS policy provided by Berkeley. In return, a grasp pose is outputted. 
  1. It is important to note that the pose generated is dependent on the internal camera intrinsics on the arm. As a result, there are two files provided for the simulated and real arm.  
     These values can be found by `rostopic echo /camera/depth/camera_info` and using the [structure of the CameraInfo msg](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/CameraInfo.html) to determine the k matrix.
- 1. The transformation currently used (manipulation.py) is not ideal due to differences between the grasp axes. More detail is provided in the file along with a potential solution.
+ 1. The transformation currently used (manipulation.py) works and otuputs the correct position, but may not produce a totaly correct orientation due to the alignment of the gripper frames. More detail is provided in manipulation.py along with a potential solution.
  
  ## Improvements:
  Get the arm running with ROS Melodic to use python3 so that the latest version of everything can just be used.  
- Figure out the transfrom issue as described above and in manipulation.py 
+ Figure out the potnetial transfrom orientation issue as described in step 6 above
 
  ## References
  [1] Mahler, J, Liang, J, Niyaz, S, Laskey, M, Doan, R, Liu, X, Ojea, J, Goldberg, K. "Dex-Net 2.0: Deep Learning to Plan Robust Grasps with Synthetic Point Clouds and Analytic Grasp Metrics". 2017.
