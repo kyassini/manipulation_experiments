@@ -85,3 +85,7 @@ to generate a pre and grasp pose directly from the approach vector.
 
 ## References
 [1] Andreas ten Pas, Marcus Gualtieri, Kate Saenko, and Robert Platt. Grasp Pose Detection in Point Clouds. The International Journal of Robotics Research, Vol 36, Issue 13-14, pp. 1455-1473. October 2017.
+
+<p align="center">
+<img src="imgs/real_gpd_example.gif" width="250">
+</p>
