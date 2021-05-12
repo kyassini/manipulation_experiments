@@ -50,7 +50,7 @@ More details here: https://github.com/uml-robotics/uml_hri_nerve_pick_and_place
 If everything runs correctly, you will get the following behavior:
    
 <p align="center">
-<img src="imgs/gpd_example.gif" width="250"><img src="imgs/gpd_example.png" width="150"> 
+<img src="imgs/real_gpd_example.gif" width="250"><img src="imgs/gpd_example.gif" width="250"><img src="imgs/gpd_example.png" width="150"> 
 </p>
 
 ## Troubleshooting
@@ -85,7 +85,3 @@ to generate a pre and grasp pose directly from the approach vector.
 
 ## References
 [1] Andreas ten Pas, Marcus Gualtieri, Kate Saenko, and Robert Platt. Grasp Pose Detection in Point Clouds. The International Journal of Robotics Research, Vol 36, Issue 13-14, pp. 1455-1473. October 2017.
-
-<p align="center">
-<img src="imgs/real_gpd_example.gif" width="250">
-</p>
